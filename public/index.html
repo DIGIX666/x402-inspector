@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>x402 Inspector POC</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0c1016;
+        --bg-2: #141b24;
+        --accent: #49e6b0;
+        --accent-2: #ffe17d;
+        --text: #e8eef5;
+        --muted: #a8b3c2;
+        --card: #111825;
+        --border: #243040;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at top left, #1e2a3a, var(--bg));
+      }
+
+      header {
+        padding: 32px 24px 16px;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 32px;
+        letter-spacing: -0.5px;
+      }
+
+      .sub {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 24px 24px;
+      }
+
+      .card {
+        background: linear-gradient(135deg, var(--card), var(--bg-2));
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 16px;
+      }
+
+      .metric {
+        font-size: 24px;
+        font-weight: 700;
+        margin-top: 8px;
+      }
+
+      .table-wrap {
+        max-width: 1100px;
+        margin: 0 auto 40px;
+        padding: 0 24px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--card);
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+
+      th,
+      td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+      }
+
+      th {
+        color: var(--muted);
+        font-weight: 600;
+        background: #0f1622;
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      .pill {
+        display: inline-flex;
+        padding: 2px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .pill.success {
+        background: rgba(73, 230, 176, 0.15);
+        color: var(--accent);
+      }
+
+      .pill.required {
+        background: rgba(255, 225, 125, 0.15);
+        color: var(--accent-2);
+      }
+
+      .footer {
+        text-align: center;
+        color: var(--muted);
+        padding-bottom: 32px;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>x402 Inspector POC</h1>
+      <div class="sub">
+        Live events from your demo API (polling every 2s). See the
+        <a href="/guide.html" style="color: var(--accent)">payment guide</a>.
+      </div>
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        Success rate
+        <div id="successRate" class="metric">-</div>
+      </div>
+      <div class="card">
+        Total volume
+        <div id="totalVolume" class="metric">-</div>
+      </div>
+      <div class="card">
+        Total revenue
+        <div id="totalRevenue" class="metric">-</div>
+      </div>
+    </section>
+
+    <section class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Endpoint</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Reason</th>
+            <th>Payer</th>
+          </tr>
+        </thead>
+        <tbody id="eventsBody"></tbody>
+      </table>
+    </section>
+
+    <div class="footer">POC only — in-memory store</div>
+
+    <script>
+      const fmt = (n) => (Number.isFinite(n) ? n.toFixed(2) : "-");
+
+      async function fetchStats() {
+        const res = await fetch("/api/stats");
+        const data = await res.json();
+        document.getElementById("successRate").textContent = `${(
+          data.successRate * 100
+        ).toFixed(1)}%`;
+        document.getElementById("totalVolume").textContent = `${fmt(
+          data.totalVolume
+        )} APT`;
+        document.getElementById("totalRevenue").textContent = `${fmt(
+          data.totalRevenue
+        )} APT`;
+      }
+
+      async function fetchEvents() {
+        const res = await fetch("/api/events?limit=20");
+        const data = await res.json();
+        const tbody = document.getElementById("eventsBody");
+        tbody.innerHTML = "";
+
+        data.events.forEach((e) => {
+          const tr = document.createElement("tr");
+          const statusClass =
+            e.event_type === "payment_success" ? "success" : "required";
+          const reason =
+            e.error?.message || e.metadata?.reason || "-";
+          tr.innerHTML = `
+            <td>${new Date(e.timestamp).toLocaleTimeString()}</td>
+            <td>${e.endpoint}</td>
+            <td>${e.amount || "-"} ${e.currency || ""}</td>
+            <td><span class="pill ${statusClass}">${e.event_type}</span></td>
+            <td>${reason}</td>
+            <td>${e.payer_anonymized ? e.payer_anonymized.slice(0, 10) : "-"}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      async function refresh() {
+        await Promise.all([fetchStats(), fetchEvents()]);
+      }
+
+      refresh();
+      setInterval(refresh, 2000);
+    </script>
+  </body>
+</html>

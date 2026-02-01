@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>x402 Payment Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0c1016;
+        --bg-2: #141b24;
+        --accent: #49e6b0;
+        --accent-2: #ffe17d;
+        --text: #e8eef5;
+        --muted: #a8b3c2;
+        --card: #111825;
+        --border: #243040;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at top left, #1e2a3a, var(--bg));
+      }
+
+      header {
+        padding: 32px 24px 16px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 30px;
+        letter-spacing: -0.4px;
+      }
+
+      .sub {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .wrap {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 24px 40px;
+      }
+
+      .card {
+        background: linear-gradient(135deg, var(--card), var(--bg-2));
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+
+      .label {
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      code {
+        background: rgba(73, 230, 176, 0.08);
+        padding: 2px 6px;
+        border-radius: 6px;
+        color: var(--accent);
+      }
+
+      pre {
+        background: #0f1622;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        overflow: auto;
+      }
+
+      a {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Payment Guide</h1>
+      <div class="sub">Use Aptos testnet APT transfers to pay for endpoints. Price is fixed at 0.01 APT.</div>
+    </header>
+
+    <div class="wrap">
+      <div class="card">
+        <div class="label">Step 1 — Start the server</div>
+        <pre><code>npm run dev</code></pre>
+        <p>Set your <code>.env.local</code> values before running.</p>
+      </div>
+
+      <div class="card">
+        <div class="label">Step 2 — Trigger a 402</div>
+        <p>Call an endpoint without payment:</p>
+        <pre><code>curl -X POST "http://localhost:3000/api/premium-data"</code></pre>
+      </div>
+
+      <div class="card">
+        <div class="label">Step 3 — Pay with a testnet transfer</div>
+        <p>
+          Send exactly <code>0.01 APT</code> on testnet to your <code>PAYMENT_RECEIVER</code>
+          address, then call the endpoint:
+        </p>
+        <pre><code>export APTOS_PRIVATE_KEY=0xYOUR_PRIVATE_KEY
+export PAYMENT_RECEIVER=0xYOUR_WALLET
+export APTOS_AMOUNT=0.01
+npm run demo:buyer</code></pre>
+      </div>
+
+      <div class="card">
+        <div class="label">What to show in the demo</div>
+        <p>
+          Make one request without payment (402), then another paid request.
+          The events will appear in the dashboard at <code>/</code>.
+        </p>
+      </div>
+
+      <a href="/">Back to dashboard</a>
+    </div>
+  </body>
+</html>

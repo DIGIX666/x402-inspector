@@ -88,10 +88,83 @@ Design goals: non-invasive integration, low overhead, production-friendly struct
 - Dev environment: Node.js + TypeScript
 - Basic x402 protocol knowledge
 
+## Quick POC (Next.js + APT payments)
+This POC runs a minimal API protected by APT transfer verification, an in-memory
+event store, and a simple dashboard at `/`. Payments are fixed at **0.01 APT**
+per request.
+
+## Demo
+![x402-inspector-demo](/imageReadme/demo.png)
+
+Demo video (local): `/imageReadme/demo.mp4`
+
+Example failure reasons shown in the dashboard:
+- `insufficient_balance` (not enough APT to pay)
+- `amount_or_recipient_mismatch` (wrong amount or receiver)
+
+Note: any private key used in the demo is test-only and empty.
+
+### Setup
+```bash
+npm install
+```
+
+### Environment
+Create `.env.local`:
+
+```bash
+PAYMENT_RECEIVER=0xYOUR_WALLET
+APTOS_NODE_URL=https://fullnode.testnet.aptoslabs.com/v1
+```
+
+### Run (dev)
+```bash
+npm run dev
+```
+
+Open the dashboard:
+```
+http://localhost:3000/
+```
+
+Trigger a 402 (no payment):
+```bash
+curl -X POST "http://localhost:3000/api/premium-data"
+```
+
+Test with payment (auto-send APT on testnet, fixed at 0.01 APT):
+```bash
+export APTOS_PRIVATE_KEY=0xYOUR_PRIVATE_KEY
+export PAYMENT_RECEIVER=0xYOUR_WALLET
+export APTOS_AMOUNT=0.01
+npm run demo:buyer
+```
+
+### Buyer demo script
+```bash
+export APTOS_PRIVATE_KEY=0xYOUR_PRIVATE_KEY
+export PAYMENT_RECEIVER=0xYOUR_WALLET
+export APTOS_AMOUNT=0.01
+export DEMO_API_URL=http://localhost:3000/api/premium-data
+npm run demo:buyer
+```
+
+### Check balance
+```bash
+export APTOS_PRIVATE_KEY=0xYOUR_PRIVATE_KEY
+export APTOS_NODE_URL=https://fullnode.testnet.aptoslabs.com/v1
+npm run check:balance
+```
+
+### Build + run (prod)
+```bash
+npm run build
+npm run start
+```
+
 
 ## Builders
 - [Thox](https://github.com/thox)
-- [Kazai777](https://github.com/kazai777)
 
 ## Hackathon 
-![x402-hackathon-APTOS](image.png)
+![x402-hackathon-APTOS](/imageReadme/image.png)

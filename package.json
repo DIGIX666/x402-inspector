@@ -1,0 +1,26 @@
+{
+  "name": "x402-inspector-poc",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Minimal x402 Inspector POC server",
+  "main": "app",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "demo:buyer": "tsx scripts/buyer-demo.ts",
+    "check:balance": "tsx scripts/check-balance.ts"
+  },
+  "dependencies": {
+    "@aptos-labs/ts-sdk": "^1.30.0",
+    "next": "^16.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "@types/react": "19.2.10",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.2"
+  }
+}
