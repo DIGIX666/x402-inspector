@@ -148,7 +148,28 @@ export APTOS_AMOUNT=0.01
 export DEMO_API_URL=http://localhost:3000/api/premium-data
 npm run demo:buyer
 ```
-
+---
+### Buyer failure demo script
+```bash
+export APTOS_PRIVATE_KEY=0xYOUR_PRIVATE_KEY
+export PAYMENT_RECEIVER=0xYOUR_WALLET
+export APTOS_AMOUNT=1
+export DEMO_API_URL=http://localhost:3000/api/premium-data
+npm run demo:buyer
+```
+### output
+```
+if insufficient balance, you'll see an error like:
+{
+  "error": "Payment failed: insufficient_balance"
+}
+--
+if amount mismatch, you'll see an error like:
+{
+  "error": "Payment failed: amount_or_recipient_mismatch"
+}
+```
+---
 ### Check balance
 ```bash
 export APTOS_PRIVATE_KEY=0xYOUR_PRIVATE_KEY
