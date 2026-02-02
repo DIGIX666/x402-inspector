@@ -96,7 +96,7 @@ per request.
 ## Demo
 ![x402-inspector-demo](/imageReadme/demo.png)
 
-Demo video (local): `/imageReadme/demo.mp4`
+[Demo video (local)](https://youtu.be/vr8kamnGNw0)
 
 Example failure reasons shown in the dashboard:
 - `insufficient_balance` (not enough APT to pay)
